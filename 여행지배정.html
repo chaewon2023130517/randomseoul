@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>서울 구와 행정동 랜덤 매핑</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f4f4f9;
+    }
+    input[type="number"] {
+      padding: 10px;
+      font-size: 16px;
+      width: 100px;
+    }
+    button {
+      padding: 10px 15px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #result {
+      margin-top: 20px;
+    }
+    .input-container {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>서울 구와 행정동 랜덤 매핑</h1>
+
+  <div class="input-container">
+    <label for="district-number">구 번호 (1-25): </label>
+    <input type="number" id="district-number" min="1" max="25">
+    <button onclick="showDistrict()">구 확인</button>
+    <p>입력 가능한 구 번호는 1부터 25까지입니다.</p>
+  </div>
+
+  <div id="result"></div>
+
+  <div id="subdistrict-section" style="display:none;">
+    <label for="subdistrict-number">행정동 번호 (1부터 해당 구의 행정동 개수까지): </label>
+    <input type="number" id="subdistrict-number">
+    <button onclick="showSubdistrict()">행정동 확인</button>
+    <p id="subdistrict-guide">입력 가능한 행정동 번호는 1부터 0까지입니다.</p>
+  </div>
+
+  <script>
+    // 서울의 25개 구 리스트
+    const districts = [
+      "종로구", "중구", "용산구", "성동구", "광진구", "동대문구", "중랑구", "성북구", "강북구", "도봉구", 
+      "노원구", "은평구", "서대문구", "마포구", "양천구", "강서구", "구로구", "금천구", "영등포구", "동작구", 
+      "관악구", "서초구", "강남구", "송파구", "강동구"
+    ];
+
+    // 랜덤으로 구 번호 할당
+    const districtNumbers = Array.from({ length: 25 }, (_, i) => i + 1);
+    const randomDistricts = shuffleArray(districtNumbers);
+
+    // 행정동 예시 (구별로 랜덤 배정할 때 사용할 행정동들)
+    const subdistricts = {
+      "종로구": ["청운효자동", "사직동", "삼청동", "한옥마을"],
+      "중구": ["소공동", "회현동", "명동", "을지로", "장충동"],
+      "용산구": ["한남동", "이태원동", "효창동", "원효로"],
+      "성동구": ["성수동", "홍익동", "송정동"],
+      "광진구": ["구의동", "자양동", "화양동", "능동"],
+      "동대문구": ["청량리동", "답십리동", "회기동", "휘경동"],
+      "중랑구": ["묵동", "상봉동", "면목동", "중화동"],
+      "성북구": ["정릉동", "길음동", "월곡동", "동소문동"],
+      "강북구": ["미아동", "번동", "수유동", "우이동"],
+      "도봉구": ["창동", "방학동", "도봉동", "쌍문동"],
+      "노원구": ["상계동", "중계동", "월계동", "공릉동"],
+      "은평구": ["신사동", "불광동", "구산동", "응암동"],
+      "서대문구": ["북아현동", "남가좌동", "홍제동", "천연동"],
+      "마포구": ["상수동", "합정동", "서교동", "염리동"],
+      "양천구": ["신정동", "목동", "오목교", "양평동"],
+      "강서구": ["화곡동", "등촌동", "내발산동", "염창동"],
+      "구로구": ["구로동", "개봉동", "오류동", "고척동"],
+      "금천구": ["시흥동", "독산동", "가산동"],  // 금천구의 행정동 추가
+      "영등포구": ["여의도동", "영등포동", "당산동", "신길동"],
+      "동작구": ["사당동", "노량진동", "흑석동", "대방동"],
+      "관악구": ["신림동", "조원동", "서울대입구동", "낙성대동"],
+      "서초구": ["방배동", "서초동", "우면동", "양재동"],
+      "강남구": ["삼성동", "역삼동", "청담동", "신사동"],
+      "송파구": ["잠실동", "풍납동", "석촌동", "가락동"],
+      "강동구": ["천호동", "상일동", "길동", "암사동"]
+    };
+
+    let currentDistrict = null;
+    let currentSubdistricts = null;
+
+    // 배열 섞기 (랜덤화)
+    function shuffleArray(arr) {
+      return arr.sort(() => Math.random() - 0.5);
+    }
+
+    // 구 번호 입력 시, 해당 구를 알려주는 함수
+    function showDistrict() {
+      const districtNumber = document.getElementById('district-number').value;
+      if (districtNumber < 1 || districtNumber > 25) {
+        alert("구 번호는 1부터 25 사이여야 합니다.");
+        return;
+      }
+
+      // 구 번호로 구 이름 찾기
+      currentDistrict = districts[randomDistricts[districtNumber - 1] - 1];
+      document.getElementById('result').innerHTML = `선택된 구: ${currentDistrict}`;
+
+      // 해당 구의 행정동 리스트를 가져오기
+      currentSubdistricts = subdistricts[currentDistrict] || [];
+      // 행정동 번호 안내 업데이트
+      document.getElementById('subdistrict-guide').innerHTML = 
+        `입력 가능한 행정동 번호는 1부터 ${currentSubdistricts.length}까지입니다.`;
+      
+      document.getElementById('subdistrict-section').style.display = 'block';
+    }
+
+    // 행정동 번호 입력 시, 해당 행정동을 알려주는 함수
+    function showSubdistrict() {
+      const subdistrictNumber = document.getElementById('subdistrict-number').value;
+      if (subdistrictNumber < 1 || subdistrictNumber > currentSubdistricts.length) {
+        alert("행정동 번호는 해당 구의 행정동 개수 내에서 입력해야 합니다.");
+        return;
+      }
+
+      const subdistrict = currentSubdistricts[subdistrictNumber - 1];
+      document.getElementById('result').innerHTML += `<br>선택된 행정동: ${subdistrict}`;
+    }
+  </script>
+
+</body>
+</html>
